@@ -58,12 +58,12 @@ public class UserService {
         VerificationToken verificationToken = new VerificationToken(
                 savedUser,
                 tokenString,
-                LocalDateTime.now().plusHours(24) // Token expires in 24 hours
+                LocalDateTime.now().plusMinutes(1) // Token expires in 1 minutes
         );
         verificationTokenRepository.save(verificationToken);
 
         // Send verification email
-        emailConfig.sendVerificationEmail(savedUser.getEmail(), tokenString, newUser.getFirstName());
+        emailConfig.sendVerificationEmail(savedUser.getEmail(), tokenString, savedUser.getFirstName());
 
         return savedUser;
     }
@@ -88,35 +88,32 @@ public class UserService {
         user.setVerified(true);
         userRepository.save(user);
 
-        // Delete the used token
-        verificationTokenRepository.delete(verificationToken);
-
         return true;
     }
 
     @Transactional
     public VerificationToken resendVerificationToken(String email) {
-        User user = userRepository.findByEmail(email)
+        User savedUser = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Delete existing token if exists
-        Optional.ofNullable(user.getVerificationToken())
-                .ifPresent(verificationTokenRepository::delete);
+        if (savedUser.isVerified()) {
+            throw new RuntimeException("User account has already been verified!");
+        }
 
-        // Generate new token
-        String tokenString = generateVerificationToken();
-        VerificationToken newToken = new VerificationToken(
-                user,
-                tokenString,
-                LocalDateTime.now().plusHours(24)
-        );
+        VerificationToken token = savedUser.getVerificationToken();
+        if (token != null) {
+            token.setToken(generateVerificationToken());
+            token.setExpiryDate(LocalDateTime.now().plusMinutes(1)); // Set expiry to 2 minutes
+            // Send verification email
+            emailConfig.sendVerificationEmail(savedUser.getEmail(), token.getToken(), savedUser.getFirstName());
 
-        // Save and send new token
-        VerificationToken savedToken = verificationTokenRepository.save(newToken);
-        emailConfig.sendVerificationEmail(email, tokenString, user.getFirstName());
-
-        return savedToken;
+            return verificationTokenRepository.save(token);
+        } else {
+            VerificationToken newToken = new VerificationToken(savedUser, generateVerificationToken(), LocalDateTime.now().plusMinutes(5));
+            return verificationTokenRepository.save(newToken);
+        }
     }
+
 
     private String generateVerificationToken() {
         SecureRandom random = new SecureRandom();

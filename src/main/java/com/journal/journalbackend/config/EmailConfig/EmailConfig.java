@@ -43,7 +43,7 @@ public class EmailConfig {
             String htmlBody = templateEngine.process("verification-email", context);
 
             helper.setTo(to);
-            helper.setFrom("dan123@gmail.com");
+            helper.setFrom("elvisikenna07@gmail.com");
             helper.setSubject("Verify Your JournalApp Account");
             helper.setText(htmlBody, true);
 
