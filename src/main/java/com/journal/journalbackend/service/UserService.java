@@ -43,6 +43,7 @@ public class UserService {
 
         // Create new user
         User newUser = new User(
+                null,
                 registrationDTO.getFirstName(),
                 registrationDTO.getLastName(),
                 registrationDTO.getUsername(),

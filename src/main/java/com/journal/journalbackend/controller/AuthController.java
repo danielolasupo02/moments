@@ -6,6 +6,7 @@ import com.journal.journalbackend.dto.response.LoginResponse;
 import com.journal.journalbackend.model.User;
 import com.journal.journalbackend.repository.UserRepository;
 import com.journal.journalbackend.service.UserService;
+import com.journal.journalbackend.util.JwtTokenProvider;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +31,14 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public AuthController(UserService userService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, UserRepository userRepository) {
+    public AuthController(UserService userService, AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, UserRepository userRepository, JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostMapping("/register")
@@ -73,11 +76,10 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity login(@Valid @RequestBody LoginRequest loginRequest) {
         try {
             // Special case for admin user
             if ("admin".equals(loginRequest.getUsername())) {
-                // Use Spring Security's authentication manager for admin
                 try {
                     Authentication authentication = authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(
@@ -86,7 +88,8 @@ public class AuthController {
                             )
                     );
 
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // Generate JWT token
+                    String jwtToken = jwtTokenProvider.generateToken(authentication);
 
                     // Admin login successful
                     LoginResponse response = new LoginResponse(
@@ -95,7 +98,8 @@ public class AuthController {
                             "admin@test.com",
                             "Admin",
                             "User",
-                            "Admin login successful"
+                            "Admin login successful",
+                            jwtToken
                     );
 
                     return ResponseEntity.ok(response);
@@ -142,17 +146,18 @@ public class AuthController {
                     authorities
             );
 
-            // Set in security context
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // Generate JWT token
+            String jwtToken = jwtTokenProvider.generateToken(authentication);
 
-            // Return user information
+            // Return user information with JWT token
             LoginResponse response = new LoginResponse(
                     user.getId(),
                     user.getUsername(),
                     user.getEmail(),
                     user.getFirstName(),
                     user.getLastName(),
-                    "Login successful"
+                    "Login Successful",
+                    jwtToken
             );
 
             return ResponseEntity.ok(response);
