@@ -1,5 +1,6 @@
 package com.journal.journalbackend.config.SecurityConfig;
 
+import com.journal.journalbackend.service.CustomUserDetailsService;
 import com.journal.journalbackend.util.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -24,24 +25,20 @@ import org.springframework.security.web.firewall.StrictHttpFirewall;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public SecurityConfig(@Lazy JwtAuthenticationFilter jwtAuthFilter) {
+    public SecurityConfig(@Lazy JwtAuthenticationFilter jwtAuthFilter,
+                          CustomUserDetailsService customUserDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Bean
-    public UserDetailsService users() {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return new InMemoryUserDetailsManager(
-                User.builder()
-                        .username("admin")
-                        .password(encoder.encode("admin"))
-                        .roles("ADMIN")
-                        .build()
-        );
+    public UserDetailsService userDetailsService() {
+        return customUserDetailsService;
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(
