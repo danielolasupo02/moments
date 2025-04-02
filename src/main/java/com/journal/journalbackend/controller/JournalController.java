@@ -49,4 +49,15 @@ public class JournalController {
         return ResponseEntity.ok(journals);
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get a specific journal by ID")
+    public ResponseEntity<JournalResponse> getJournalById(
+            @PathVariable Long id,
+            Principal principal) {
+
+        String username = principal.getName();
+        JournalResponse journal = journalService.getJournalByIdAndUsername(id, username);
+        return ResponseEntity.ok(journal);
+    }
+
 }

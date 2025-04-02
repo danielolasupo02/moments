@@ -47,6 +47,20 @@ public class JournalService {
                 .toList();
     }
 
+    public JournalResponse getJournalByIdAndUsername(Long journalId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Journal journal = journalRepository.findById(journalId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
+
+        if (!journal.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+
+        return mapToJournalResponse(journal);
+    }
+
     private JournalResponse mapToJournalResponse(Journal journal) {
         JournalResponse response = new JournalResponse();
         response.setId(journal.getId());
