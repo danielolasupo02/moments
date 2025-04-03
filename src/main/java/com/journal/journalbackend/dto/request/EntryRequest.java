@@ -1,5 +1,8 @@
 package com.journal.journalbackend.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Column;
+import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -12,9 +15,12 @@ public class EntryRequest {
     private String title;
 
     @NotBlank(message = "Body content is required")
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String body;
 
     @NotNull(message = "Entry date is required")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate entryDate;
 
     // Getters and setters
