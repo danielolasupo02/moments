@@ -36,16 +36,16 @@ public class EntryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-//    @GetMapping
-//    @Operation(summary = "Get all entries for a journal")
-//    public ResponseEntity<List<EntryResponse>> getEntriesByJournalId(
-//            @PathVariable Long journalId,
-//            Principal principal) {
-//
-//        List<EntryResponse> entries = entryService.getEntriesByJournalId(journalId, principal.getName());
-//        return ResponseEntity.ok(entries);
-//    }
-//
+    @GetMapping
+    @Operation(summary = "Get all entries for a journal")
+    public ResponseEntity<List<EntryResponse>> getEntriesByJournalId(
+            @PathVariable Long journalId,
+            Principal principal) {
+
+        List<EntryResponse> entries = entryService.getEntriesByJournalId(journalId, principal.getName());
+        return ResponseEntity.ok(entries);
+    }
+
 //    @GetMapping("/{entryId}")
 //    @Operation(summary = "Get a specific entry by ID")
 //    public ResponseEntity<EntryResponse> getEntryById(

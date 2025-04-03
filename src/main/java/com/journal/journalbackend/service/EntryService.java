@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class EntryService {
     private final EntryRepository entryRepository;
@@ -47,23 +50,23 @@ public class EntryService {
         Entry savedEntry = entryRepository.save(entry);
         return mapToEntryResponse(savedEntry);
     }
-//
-//    public List<EntryResponse> getEntriesByJournalId(Long journalId, String username) {
-//        User user = userRepository.findByUsername(username)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-//
-//        Journal journal = journalRepository.findById(journalId)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
-//
-//        if (!journal.getUser().getId().equals(user.getId())) {
-//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this journal");
-//        }
-//
-//        List<Entry> entries = entryRepository.findByJournalId(journalId);
-//        return entries.stream()
-//                .map(this::mapToEntryResponse)
-//                .collect(Collectors.toList());
-//    }
+
+    public List<EntryResponse> getEntriesByJournalId(Long journalId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Journal journal = journalRepository.findById(journalId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
+
+        if (!journal.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this journal");
+        }
+
+        List<Entry> entries = entryRepository.findByJournalId(journalId);
+        return entries.stream()
+                .map(this::mapToEntryResponse)
+                .collect(Collectors.toList());
+    }
 //
 //    public EntryResponse getEntryById(Long journalId, Long entryId, String username) {
 //        User user = userRepository.findByUsername(username)
@@ -123,7 +126,7 @@ public class EntryService {
 //
 //        entryRepository.deleteById(entryId);
 //    }
-//
+
     private EntryResponse mapToEntryResponse(Entry entry) {
         EntryResponse response = new EntryResponse();
         response.setId(entry.getId());
