@@ -67,23 +67,23 @@ public class EntryService {
                 .map(this::mapToEntryResponse)
                 .collect(Collectors.toList());
     }
-//
-//    public EntryResponse getEntryById(Long journalId, Long entryId, String username) {
-//        User user = userRepository.findByUsername(username)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-//
-//        Journal journal = journalRepository.findById(journalId)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
-//
-//        if (!journal.getUser().getId().equals(user.getId())) {
-//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this journal");
-//        }
-//
-//        Entry entry = entryRepository.findByIdAndJournalId(entryId, journalId)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
-//
-//        return mapToEntryResponse(entry);
-//    }
+
+    public EntryResponse getEntryById(Long journalId, Long entryId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Journal journal = journalRepository.findById(journalId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
+
+        if (!journal.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this journal");
+        }
+
+        Entry entry = entryRepository.findByIdAndJournalId(entryId, journalId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
+
+        return mapToEntryResponse(entry);
+    }
 //
 //    public EntryResponse updateEntry(Long journalId, Long entryId, EntryRequest entryRequest, String username) {
 //        User user = userRepository.findByUsername(username)

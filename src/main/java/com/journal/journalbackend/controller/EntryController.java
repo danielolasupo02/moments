@@ -46,16 +46,16 @@ public class EntryController {
         return ResponseEntity.ok(entries);
     }
 
-//    @GetMapping("/{entryId}")
-//    @Operation(summary = "Get a specific entry by ID")
-//    public ResponseEntity<EntryResponse> getEntryById(
-//            @PathVariable Long journalId,
-//            @PathVariable Long entryId,
-//            Principal principal) {
-//
-//        EntryResponse entry = entryService.getEntryById(journalId, entryId, principal.getName());
-//        return ResponseEntity.ok(entry);
-//    }
+    @GetMapping("/{entryId}")
+    @Operation(summary = "Get a specific entry by ID")
+    public ResponseEntity<EntryResponse> getEntryById(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            Principal principal) {
+
+        EntryResponse entry = entryService.getEntryById(journalId, entryId, principal.getName());
+        return ResponseEntity.ok(entry);
+    }
 //
 //    @PutMapping("/{entryId}")
 //    @Operation(summary = "Update an existing entry")
