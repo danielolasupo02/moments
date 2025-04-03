@@ -69,14 +69,14 @@ public class EntryController {
         return ResponseEntity.ok(response);
     }
 
-//    @DeleteMapping("/{entryId}")
-//    @Operation(summary = "Delete an entry")
-//    public ResponseEntity<Void> deleteEntry(
-//            @PathVariable Long journalId,
-//            @PathVariable Long entryId,
-//            Principal principal) {
-//
-//        entryService.deleteEntry(journalId, entryId, principal.getName());
-//        return ResponseEntity.noContent().build();
-//    }
+    @DeleteMapping("/{entryId}")
+    @Operation(summary = "Delete an entry")
+    public ResponseEntity<Void> deleteEntry(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            Principal principal) {
+
+        entryService.deleteEntry(journalId, entryId, principal.getName());
+        return ResponseEntity.noContent().build();
+    }
 }
