@@ -56,19 +56,19 @@ public class EntryController {
         EntryResponse entry = entryService.getEntryById(journalId, entryId, principal.getName());
         return ResponseEntity.ok(entry);
     }
-//
-//    @PutMapping("/{entryId}")
-//    @Operation(summary = "Update an existing entry")
-//    public ResponseEntity<EntryResponse> updateEntry(
-//            @PathVariable Long journalId,
-//            @PathVariable Long entryId,
-//            @Valid @RequestBody EntryRequest entryRequest,
-//            Principal principal) {
-//
-//        EntryResponse response = entryService.updateEntry(journalId, entryId, entryRequest, principal.getName());
-//        return ResponseEntity.ok(response);
-//    }
-//
+
+    @PutMapping("/{entryId}")
+    @Operation(summary = "Update an existing entry")
+    public ResponseEntity<EntryResponse> updateEntry(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            @Valid @RequestBody EntryRequest entryRequest,
+            Principal principal) {
+
+        EntryResponse response = entryService.updateEntry(journalId, entryId, entryRequest, principal.getName());
+        return ResponseEntity.ok(response);
+    }
+
 //    @DeleteMapping("/{entryId}")
 //    @Operation(summary = "Delete an entry")
 //    public ResponseEntity<Void> deleteEntry(

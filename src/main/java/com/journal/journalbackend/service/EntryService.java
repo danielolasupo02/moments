@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -84,29 +85,29 @@ public class EntryService {
 
         return mapToEntryResponse(entry);
     }
-//
-//    public EntryResponse updateEntry(Long journalId, Long entryId, EntryRequest entryRequest, String username) {
-//        User user = userRepository.findByUsername(username)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-//
-//        Journal journal = journalRepository.findById(journalId)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
-//
-//        if (!journal.getUser().getId().equals(user.getId())) {
-//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this journal");
-//        }
-//
-//        Entry entry = entryRepository.findByIdAndJournalId(entryId, journalId)
-//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
-//
-//        entry.setTitle(entryRequest.getTitle());
-//        entry.setBody(entryRequest.getBody());
-//        entry.setEntryDate(entryRequest.getEntryDate());
-//        entry.setLastEditedAt(LocalDateTime.now());
-//
-//        Entry updatedEntry = entryRepository.save(entry);
-//        return mapToEntryResponse(updatedEntry);
-//    }
+
+    public EntryResponse updateEntry(Long journalId, Long entryId, EntryRequest entryRequest, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Journal journal = journalRepository.findById(journalId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
+
+        if (!journal.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this journal");
+        }
+
+        Entry entry = entryRepository.findByIdAndJournalId(entryId, journalId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
+
+        entry.setTitle(entryRequest.getTitle());
+        entry.setBody(entryRequest.getBody());
+        entry.setEntryDate(entryRequest.getEntryDate());
+        entry.setLastEditedAt(LocalDateTime.now());
+
+        Entry updatedEntry = entryRepository.save(entry);
+        return mapToEntryResponse(updatedEntry);
+    }
 //
 //    public void deleteEntry(Long journalId, Long entryId, String username) {
 //        // Verify user has access
