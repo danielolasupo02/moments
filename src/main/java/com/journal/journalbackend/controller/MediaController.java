@@ -43,5 +43,12 @@ public class MediaController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Get all media for a journal entry")
+    @GetMapping
+    public ResponseEntity<List<MediaResponse>> getAllMediaForEntry(@PathVariable Long entryId) {
+        List<MediaResponse> mediaList = mediaService.getAllMediaForEntry(entryId);
+        return ResponseEntity.ok(mediaList);
+    }
+
 
 }

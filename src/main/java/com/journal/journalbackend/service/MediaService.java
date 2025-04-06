@@ -88,6 +88,19 @@ public class MediaService {
         }
     }
 
+        public List<MediaResponse> getAllMediaForEntry(Long entryId) {
+        // Validate entry exists
+        entryRepository.findById(entryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found with id: " + entryId));
+
+        // Get all media for entry
+        List<Media> mediaList = mediaRepository.findByEntryId(entryId);
+
+        return mediaList.stream()
+                .map(this::convertToMediaResponse)
+                .collect(Collectors.toList());
+    }
+
 
     private MediaResponse convertToMediaResponse(Media media) {
         MediaResponse response = new MediaResponse();
