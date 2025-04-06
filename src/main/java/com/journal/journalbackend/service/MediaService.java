@@ -63,7 +63,7 @@ public class MediaService {
             // Generate a unique filename
             String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
             String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String filename = UUID.randomUUID().toString() + fileExtension;
+            String filename = UUID.randomUUID() + fileExtension;
 
             // Create media record
             Media media = new Media();
@@ -88,7 +88,7 @@ public class MediaService {
         }
     }
 
-        public List<MediaResponse> getAllMediaForEntry(Long entryId) {
+    public List<MediaResponse> getAllMediaForEntry(Long entryId) {
         // Validate entry exists
         entryRepository.findById(entryId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found with id: " + entryId));
@@ -99,6 +99,24 @@ public class MediaService {
         return mediaList.stream()
                 .map(this::convertToMediaResponse)
                 .collect(Collectors.toList());
+    }
+
+    public void deleteMedia(Long entryId, Long mediaId) {
+        // Get media record
+        Media media = mediaRepository.findByIdAndEntryId(mediaId, entryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Media not found with id: " + mediaId));
+
+        try {
+            // Delete file from disk
+            Path filePath = this.fileStorageLocation.resolve(media.getFilename()).normalize();
+            Files.deleteIfExists(filePath);
+
+            // Delete media record from database
+            mediaRepository.delete(media);
+        } catch (IOException ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Could not delete file", ex);
+        }
+
     }
 
 

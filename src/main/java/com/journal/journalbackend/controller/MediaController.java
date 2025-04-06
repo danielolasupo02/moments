@@ -50,5 +50,12 @@ public class MediaController {
         return ResponseEntity.ok(mediaList);
     }
 
+    @Operation(summary = "Delete media by ID")
+    @DeleteMapping("/{mediaId}")
+    public ResponseEntity<Void> deleteMedia(@PathVariable Long entryId, @PathVariable Long mediaId) {
+        mediaService.deleteMedia(entryId, mediaId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
