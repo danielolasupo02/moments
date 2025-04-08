@@ -1,5 +1,6 @@
 package com.journal.journalbackend.controller;
 
+import com.journal.journalbackend.dto.request.ChangePasswordRequest;
 import com.journal.journalbackend.dto.request.LoginRequest;
 import com.journal.journalbackend.dto.request.UserRegistrationRequest;
 import com.journal.journalbackend.dto.response.LoginResponse;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -167,6 +169,32 @@ public class AuthController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("An error occurred during authentication: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            Authentication authentication,
+            @Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
+        try {
+            // Debug authentication object
+            if (authentication == null) {
+                System.out.println("Authentication is null!");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
+            }
+
+            System.out.println("Authentication class: " + authentication.getClass().getName());
+            System.out.println("Authentication principal: " + authentication.getPrincipal());
+            String username = authentication.getName();
+            System.out.println("Username from authentication: " + username);
+
+            userService.changePassword(username, changePasswordRequest);
+            return ResponseEntity.ok("Password changed successfully");
+        } catch (RuntimeException e) {
+            System.out.println("Error in changePassword: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
         }
     }
 }

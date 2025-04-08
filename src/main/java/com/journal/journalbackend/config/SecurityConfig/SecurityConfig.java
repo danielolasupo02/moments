@@ -58,6 +58,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
                         .requestMatchers("/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/forgot-password", "/api/auth/reset-password").permitAll()
+                        .requestMatchers("/api/auth/change-password").authenticated()
                         .anyRequest().authenticated()
                 )
                 // Remove form login configuration as we're using JWT now

@@ -1,15 +1,18 @@
 package com.journal.journalbackend.service;
 
 import com.journal.journalbackend.config.EmailConfig.EmailConfig;
+import com.journal.journalbackend.dto.request.ChangePasswordRequest;
 import com.journal.journalbackend.dto.request.UserRegistrationRequest;
 import com.journal.journalbackend.model.User;
 import com.journal.journalbackend.model.VerificationToken;
 import com.journal.journalbackend.repository.UserRepository;
 import com.journal.journalbackend.repository.VerificationTokenRepository;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -120,5 +123,42 @@ public class UserService {
         SecureRandom random = new SecureRandom();
         int code = 100_000 + random.nextInt(900_000); // Generates a number between 100000 and 999999
         return String.valueOf(code);
+    }
+
+    @Transactional
+    public boolean changePassword(String username, ChangePasswordRequest request) {
+        System.out.println("Attempting to change password for user: " + username);
+
+        // Validate password match
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new RuntimeException("Passwords do not match");
+        }
+
+
+        // Find user
+        Optional<User> userOptional = userRepository.findByUsername(username);
+
+
+        if (userOptional.isEmpty()) {
+            System.out.println("User not found with username: " + username);
+            throw new RuntimeException("User not found");
+        }
+
+        User user = userOptional.get();
+        System.out.println("User found: " + user.getId() + " - " + user.getUsername());
+
+        // Validate current password
+        boolean passwordMatches = passwordEncoder.matches(request.getCurrentPassword(), user.getPasswordHash());
+        System.out.println("Password match result: " + passwordMatches);
+
+        if (!passwordMatches) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        // Update password
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        return true;
     }
 }
