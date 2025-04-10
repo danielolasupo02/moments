@@ -1,8 +1,6 @@
 package com.journal.journalbackend.controller;
 
-import com.journal.journalbackend.dto.request.ChangePasswordRequest;
-import com.journal.journalbackend.dto.request.LoginRequest;
-import com.journal.journalbackend.dto.request.UserRegistrationRequest;
+import com.journal.journalbackend.dto.request.*;
 import com.journal.journalbackend.dto.response.LoginResponse;
 import com.journal.journalbackend.model.User;
 import com.journal.journalbackend.repository.UserRepository;
@@ -16,9 +14,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -193,6 +189,29 @@ public class AuthController {
         } catch (RuntimeException e) {
             System.out.println("Error in changePassword: " + e.getMessage());
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> initiatePasswordReset(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        try {
+            userService.initiatePasswordReset(forgotPasswordRequest);
+            return ResponseEntity.ok("If this email is registered, a password reset link has been sent");
+        } catch (Exception e) {
+            // Log the error but return a generic message
+            System.err.println("Error in forgot password: " + e.getMessage());
+            return ResponseEntity.ok("If this email is registered, a password reset link has been sent");
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+        try {
+            userService.resetPassword(resetPasswordRequest);
+            return ResponseEntity.ok("Password has been reset successfully");
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(e.getMessage());
         }

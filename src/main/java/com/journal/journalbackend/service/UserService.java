@@ -2,21 +2,29 @@ package com.journal.journalbackend.service;
 
 import com.journal.journalbackend.config.EmailConfig.EmailConfig;
 import com.journal.journalbackend.dto.request.ChangePasswordRequest;
+import com.journal.journalbackend.dto.request.ForgotPasswordRequest;
+import com.journal.journalbackend.dto.request.ResetPasswordRequest;
 import com.journal.journalbackend.dto.request.UserRegistrationRequest;
+import com.journal.journalbackend.model.PasswordResetToken;
 import com.journal.journalbackend.model.User;
 import com.journal.journalbackend.model.VerificationToken;
+import com.journal.journalbackend.repository.PasswordResetTokenRepository;
 import com.journal.journalbackend.repository.UserRepository;
 import com.journal.journalbackend.repository.VerificationTokenRepository;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -24,17 +32,19 @@ public class UserService {
     private final VerificationTokenRepository verificationTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailConfig emailConfig;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     public UserService(
             UserRepository userRepository,
             VerificationTokenRepository verificationTokenRepository,
             PasswordEncoder passwordEncoder,
-            EmailConfig emailConfig
-    ) {
+            EmailConfig emailConfig,
+            PasswordResetTokenRepository passwordResetTokenRepository) {
         this.userRepository = userRepository;
         this.verificationTokenRepository = verificationTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailConfig = emailConfig;
+        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     @Transactional
@@ -161,4 +171,80 @@ public class UserService {
 
         return true;
     }
+
+    @Transactional
+    public void initiatePasswordReset(ForgotPasswordRequest request) {
+        Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+
+        // Always return the same message regardless of whether the email exists
+        if (userOptional.isEmpty()) {
+            // User not found, but we don't want to reveal this for security reasons
+            return;
+        }
+
+        User user = userOptional.get();
+
+        // Generate and hash the token
+        String token = generateResetToken();
+
+        // Save the token to the database
+        PasswordResetToken resetToken = new PasswordResetToken(
+                user,
+                token,
+                LocalDateTime.now().plusMinutes(15) // Token expires in 15 minutes
+        );
+        passwordResetTokenRepository.save(resetToken);
+
+        // Send reset email
+        emailConfig.sendPasswordResetEmail(user.getEmail(), token, user.getFirstName());
+    }
+
+    @Transactional
+    public boolean resetPassword(ResetPasswordRequest request) {
+        // Validate password match
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new RuntimeException("Passwords do not match");
+        }
+
+        // Find the token
+        Optional<PasswordResetToken> tokenOptional = passwordResetTokenRepository.findByToken(request.getToken());
+
+        if (tokenOptional.isEmpty()) {
+            throw new RuntimeException("Invalid password reset token");
+        }
+
+        PasswordResetToken resetToken = tokenOptional.get();
+
+        // Check if token is expired or used
+        if (resetToken.isExpired()) {
+            throw new RuntimeException("Password reset token has expired");
+        }
+
+        if (resetToken.isUsed()) {
+            throw new RuntimeException("Password reset token has already been used");
+        }
+
+        // Get the user
+        User user = resetToken.getUser();
+
+        // Update password
+        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        // Mark token as used
+        resetToken.setUsed(true);
+        passwordResetTokenRepository.save(resetToken);
+
+        // Invalidate all other tokens for this user
+        passwordResetTokenRepository.invalidateAllTokensForUser(user);
+
+        return true;
+    }
+
+    private String generateResetToken() {
+        return UUID.randomUUID().toString();
+    }
+
+
+
 }
