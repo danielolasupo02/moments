@@ -186,14 +186,23 @@ public class UserService {
 
         // Generate and hash the token
         String token = generateResetToken();
+        LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(15); // Token expires in 15 minutes
 
-        // Save the token to the database
-        PasswordResetToken resetToken = new PasswordResetToken(
-                user,
-                token,
-                LocalDateTime.now().plusMinutes(15) // Token expires in 15 minutes
-        );
-        passwordResetTokenRepository.save(resetToken);
+        // Check if user already has a token and update it, otherwise create new
+        Optional<PasswordResetToken> existingToken = passwordResetTokenRepository.findByUser(user);
+
+        if (existingToken.isPresent()) {
+            // Update existing token
+            PasswordResetToken resetToken = existingToken.get();
+            resetToken.setToken(token);
+            resetToken.setUsed(false);
+            resetToken.setExpiryDate(expiryDate);
+            passwordResetTokenRepository.save(resetToken);
+        } else {
+            // Create new token
+            PasswordResetToken resetToken = new PasswordResetToken(user, token, expiryDate);
+            passwordResetTokenRepository.save(resetToken);
+        }
 
         // Send reset email
         emailConfig.sendPasswordResetEmail(user.getEmail(), token, user.getFirstName());

@@ -66,13 +66,13 @@ public class EmailConfig {
             Context context = new Context();
             context.setVariable("firstName", firstName);
             context.setVariable("token", token);
-            context.setVariable("resetUrl", "http://localhost:8080/reset-password?token=" + token);
+            context.setVariable("resetUrl", "http://localhost:8081/reset-password?token=" + token);
 
             // Process the email template
             String htmlBody = templateEngine.process("reset-password-email", context);
 
             helper.setTo(to);
-            helper.setFrom("daniel.olasupo@stu.cu.edu.ng");
+            helper.setFrom("elvisikenna07@gmail.com");
             helper.setSubject("Reset Your JournalApp Password");
             helper.setText(htmlBody, true);
 

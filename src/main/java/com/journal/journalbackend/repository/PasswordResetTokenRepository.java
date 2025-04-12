@@ -12,9 +12,11 @@ import java.util.Optional;
 
 public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
     Optional<PasswordResetToken> findByToken(String token);
-    List<PasswordResetToken> findByUser(User user);
+    Optional<PasswordResetToken> findByUser(User user);
 
     @Modifying
     @Query("UPDATE PasswordResetToken t SET t.used = true WHERE t.user = :user AND t.used = false")
     void invalidateAllTokensForUser(@Param("user") User user);
+
+
 }
