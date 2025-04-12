@@ -1,8 +1,11 @@
 package com.journal.journalbackend.controller;
 
 import com.journal.journalbackend.dto.request.JournalRequest;
+import com.journal.journalbackend.dto.request.JournalUpdateRequest;
+import com.journal.journalbackend.dto.response.EntryResponse;
 import com.journal.journalbackend.dto.response.JournalResponse;
 import com.journal.journalbackend.model.User;
+import com.journal.journalbackend.repository.UserRepository;
 import com.journal.journalbackend.service.JournalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -10,10 +13,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
@@ -24,11 +25,12 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class JournalController {
     private final JournalService journalService;
+    private final UserRepository userRepository;
 
-    public JournalController(JournalService journalService) {
+    public JournalController(JournalService journalService, UserRepository userRepository) {
         this.journalService = journalService;
+        this.userRepository = userRepository;
     }
-
 
     @PostMapping
     @Operation(summary = "Create a new journal")
@@ -59,5 +61,14 @@ public class JournalController {
         JournalResponse journal = journalService.getJournalByIdAndUsername(id, username);
         return ResponseEntity.ok(journal);
     }
+
+    @PutMapping("/{journalId}")
+    public ResponseEntity<JournalResponse> updateJournal(
+            @PathVariable Long journalId,
+            @Valid @RequestBody JournalUpdateRequest updateRequest,
+            Principal principal) {
+        JournalResponse response = journalService.updateJournal(journalId, principal.getName(), updateRequest);
+        return ResponseEntity.ok(response);
+            }
 
 }
