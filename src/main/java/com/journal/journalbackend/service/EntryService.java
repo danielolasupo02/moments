@@ -1,5 +1,6 @@
 package com.journal.journalbackend.service;
 
+
 import com.journal.journalbackend.dto.request.EntryRequest;
 import com.journal.journalbackend.dto.response.EntryResponse;
 import com.journal.journalbackend.model.Entry;
@@ -29,19 +30,8 @@ public class EntryService {
     }
 
     public EntryResponse createEntry(Long journalId, EntryRequest entryRequest, String username) {
-        // First check if user exists
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        Journal journal = getJournalIfOwnedByUser(journalId, username);
 
-        // Check if journal exists and belongs to user
-        Journal journal = journalRepository.findById(journalId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
-
-        if (!journal.getUser().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this journal");
-        }
-
-        // Create entry
         Entry entry = new Entry();
         entry.setTitle(entryRequest.getTitle());
         entry.setBody(entryRequest.getBody());
@@ -53,32 +43,15 @@ public class EntryService {
     }
 
     public List<EntryResponse> getEntriesByJournalId(Long journalId, String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        getJournalIfOwnedByUser(journalId, username); // Just to verify access
 
-        Journal journal = journalRepository.findById(journalId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
-
-        if (!journal.getUser().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this journal");
-        }
-
-        List<Entry> entries = entryRepository.findByJournalId(journalId);
-        return entries.stream()
+        return entryRepository.findByJournalId(journalId).stream()
                 .map(this::mapToEntryResponse)
                 .collect(Collectors.toList());
     }
 
     public EntryResponse getEntryById(Long journalId, Long entryId, String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        Journal journal = journalRepository.findById(journalId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
-
-        if (!journal.getUser().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this journal");
-        }
+        getJournalIfOwnedByUser(journalId, username); // Ensure access
 
         Entry entry = entryRepository.findByIdAndJournalId(entryId, journalId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
@@ -87,15 +60,7 @@ public class EntryService {
     }
 
     public EntryResponse updateEntry(Long journalId, Long entryId, EntryRequest entryRequest, String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        Journal journal = journalRepository.findById(journalId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
-
-        if (!journal.getUser().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this journal");
-        }
+        getJournalIfOwnedByUser(journalId, username); // Ensure access
 
         Entry entry = entryRepository.findByIdAndJournalId(entryId, journalId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
@@ -110,10 +75,24 @@ public class EntryService {
     }
 
     public void deleteEntry(Long journalId, Long entryId, String username) {
-        // Verify user has access
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        getJournalIfOwnedByUser(journalId, username); // Ensure access
 
+        if (!entryRepository.existsByIdAndJournalId(entryId, journalId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found");
+        }
+
+        entryRepository.deleteById(entryId);
+    }
+
+    // 🔁 Reused helper methods to remove repetitive logic
+
+    private User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    private Journal getJournalIfOwnedByUser(Long journalId, String username) {
+        User user = getUserByUsername(username);
         Journal journal = journalRepository.findById(journalId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
 
@@ -121,11 +100,7 @@ public class EntryService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this journal");
         }
 
-        if (!entryRepository.existsByIdAndJournalId(entryId, journalId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found");
-        }
-
-        entryRepository.deleteById(entryId);
+        return journal;
     }
 
     private EntryResponse mapToEntryResponse(Entry entry) {
