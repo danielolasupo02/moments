@@ -16,80 +16,71 @@ import java.util.List;
 
 @Service
 public class JournalService {
+
     private final JournalRepository journalRepository;
     private final UserRepository userRepository;
+
     public JournalService(JournalRepository journalRepository, UserRepository userRepository) {
         this.journalRepository = journalRepository;
         this.userRepository = userRepository;
     }
 
-
-
     public JournalResponse createJournal(JournalRequest journalRequest, String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = getUserByUsername(username);
 
         Journal journal = new Journal();
         journal.setTitle(journalRequest.getTitle());
         journal.setUser(user);
 
-        Journal savedJournal = journalRepository.save(journal);
-
-        return mapToJournalResponse(savedJournal);
+        return mapToJournalResponse(journalRepository.save(journal));
     }
 
     public List<JournalResponse> getJournalsByUsername(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = getUserByUsername(username);
 
-        List<Journal> journals = journalRepository.findByUser(user);
-
-        return journals.stream()
+        return journalRepository.findByUser(user).stream()
                 .map(this::mapToJournalResponse)
                 .toList();
     }
 
     public JournalResponse getJournalByIdAndUsername(Long journalId, String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = getUserByUsername(username);
+        Journal journal = getJournalById(journalId);
 
-        Journal journal = journalRepository.findById(journalId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
-
-        if (!journal.getUser().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
-        }
+        verifyOwnership(journal, user);
 
         return mapToJournalResponse(journal);
     }
 
     @Transactional
     public JournalResponse updateJournal(Long journalId, String username, JournalUpdateRequest updateRequest) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User user = getUserByUsername(username);
+        Journal journal = getJournalById(journalId);
 
-        // Find the journal by ID
-        Journal journal = journalRepository.findById(journalId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Journal not found with id: " + journalId));
+        verifyOwnership(journal, user);
 
-        // Check if the journal belongs to the user
-        if (!journal.getUser().getId().equals(user.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "You don't have permission to update this journal");
-        }
-
-        // Update the journal title
         journal.setTitle(updateRequest.getTitle());
 
-        // Save the updated journal - updatedAt timestamp will be automatically updated by @UpdateTimestamp
-        Journal updatedJournal = journalRepository.save(journal);
-
-        // Convert to response DTO and return
-        return mapToJournalResponse(updatedJournal);
+        return mapToJournalResponse(journalRepository.save(journal));
     }
 
+    // 🔁 Reused methods to remove repetitive logic
 
+    private User getUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    private Journal getJournalById(Long journalId) {
+        return journalRepository.findById(journalId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Journal not found"));
+    }
+
+    private void verifyOwnership(Journal journal, User user) {
+        if (!journal.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
+        }
+    }
 
     private JournalResponse mapToJournalResponse(Journal journal) {
         JournalResponse response = new JournalResponse();
@@ -100,5 +91,4 @@ public class JournalService {
         response.setUpdatedAt(journal.getUpdatedAt());
         return response;
     }
-
 }
