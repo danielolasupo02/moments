@@ -1,6 +1,6 @@
 package com.journal.journalbackend.service;
 
-import com.journal.journalbackend.config.EmailConfig.EmailConfig;
+import com.journal.journalbackend.config.EmailConfig;
 import com.journal.journalbackend.dto.request.ChangePasswordRequest;
 import com.journal.journalbackend.dto.request.ForgotPasswordRequest;
 import com.journal.journalbackend.dto.request.ResetPasswordRequest;
@@ -11,18 +11,13 @@ import com.journal.journalbackend.model.VerificationToken;
 import com.journal.journalbackend.repository.PasswordResetTokenRepository;
 import com.journal.journalbackend.repository.UserRepository;
 import com.journal.journalbackend.repository.VerificationTokenRepository;
-
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -61,7 +56,8 @@ public class UserService {
                 registrationDTO.getLastName(),
                 registrationDTO.getUsername(),
                 registrationDTO.getEmail(),
-                passwordEncoder.encode(registrationDTO.getPassword())
+                passwordEncoder.encode(registrationDTO.getPassword()),
+                ZoneId.of(registrationDTO.getTimezone())
         );
 
         // Save user

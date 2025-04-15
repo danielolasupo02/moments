@@ -3,6 +3,7 @@ package com.journal.journalbackend.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,6 +35,10 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "timezone", nullable = false)
+    private ZoneId timezone = ZoneId.of("UTC");
+
+
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
@@ -52,7 +57,7 @@ public class User {
      * Constructor for reconstructing a User entity from existing data.
      * Used primarily when manually creating instances from database records or for testing.
      */
-    public User(Long id, String firstName, String lastName, String username, String email, String passwordHash) {
+    public User(Long id, String firstName, String lastName, String username, String email, String passwordHash, ZoneId timezone) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -60,6 +65,7 @@ public class User {
         this.email = email;
         this.passwordHash = passwordHash;
         this.isVerified = false;
+        this.timezone = timezone != null ? timezone : ZoneId.of("UTC");
     }
 
     /**
@@ -116,6 +122,14 @@ public class User {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public ZoneId getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(ZoneId timezone) {
+        this.timezone = timezone;
     }
 
     public boolean isVerified() {
