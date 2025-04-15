@@ -1,4 +1,4 @@
-package com.journal.journalbackend.config.SecurityConfig;
+package com.journal.journalbackend.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

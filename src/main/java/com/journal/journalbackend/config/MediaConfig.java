@@ -1,4 +1,4 @@
-package com.journal.journalbackend.config.MediaConfig;
+package com.journal.journalbackend.config;
 
 
 import com.journal.journalbackend.repository.EntryRepository;

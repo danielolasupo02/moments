@@ -1,4 +1,4 @@
-package com.journal.journalbackend.config.EmailConfig;
+package com.journal.journalbackend.config;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

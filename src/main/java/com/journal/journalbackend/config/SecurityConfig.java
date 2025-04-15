@@ -1,4 +1,4 @@
-package com.journal.journalbackend.config.SecurityConfig;
+package com.journal.journalbackend.config;
 
 import com.journal.journalbackend.service.CustomUserDetailsService;
 import com.journal.journalbackend.util.JwtAuthenticationFilter;

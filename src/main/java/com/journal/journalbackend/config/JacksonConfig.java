@@ -1,4 +1,4 @@
-package com.journal.journalbackend.config.JacksonConfig;
+package com.journal.journalbackend.config;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
