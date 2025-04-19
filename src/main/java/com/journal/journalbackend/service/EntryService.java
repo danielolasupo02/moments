@@ -11,6 +11,7 @@ import com.journal.journalbackend.repository.JournalRepository;
 import com.journal.journalbackend.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -84,8 +85,13 @@ public class EntryService {
         entryRepository.deleteById(entryId);
     }
 
-    // 🔁 Reused helper methods to remove repetitive logic
 
+    @Transactional(readOnly = true)
+    public long getEntryCountForUserBetweenDates(Long userId, LocalDateTime start, LocalDateTime end) {
+        return entryRepository.countByUserAndDateRange(userId, start, end);
+    }
+
+    // 🔁 Reused helper methods to remove repetitive logic
     private User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));

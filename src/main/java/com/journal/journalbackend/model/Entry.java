@@ -2,11 +2,13 @@ package com.journal.journalbackend.model;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 
 @Entity
-@Table(name = "entries")
+@Table(name = "entries", indexes = {
+        @Index(name = "idx_entry_user_created", columnList = "journal_id, created_at"),
+        @Index(name = "idx_entry_created_at", columnList = "created_at")
+})
 public class Entry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -122,5 +124,15 @@ public class Entry {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
         lastEditedAt = LocalDateTime.now();
+    }
+
+    public ZonedDateTime getCreatedAtInTimezone(ZoneId timezone) {
+        return createdAt.atZone(ZoneOffset.UTC).withZoneSameInstant(timezone);
+    }
+
+    public ZonedDateTime getUpdatedAtInTimezone(ZoneId timezone) {
+        return updatedAt != null ?
+                updatedAt.atZone(ZoneOffset.UTC).withZoneSameInstant(timezone) :
+                null;
     }
 }

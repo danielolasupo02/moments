@@ -11,6 +11,7 @@ import com.journal.journalbackend.model.VerificationToken;
 import com.journal.journalbackend.repository.PasswordResetTokenRepository;
 import com.journal.journalbackend.repository.UserRepository;
 import com.journal.journalbackend.repository.VerificationTokenRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -249,6 +251,12 @@ public class UserService {
     private String generateResetToken() {
         return UUID.randomUUID().toString();
     }
+
+    public List<User> getAllVerifiedUsers() {
+        return userRepository.findByIsVerifiedTrue();
+    }
+
+
 
 
 

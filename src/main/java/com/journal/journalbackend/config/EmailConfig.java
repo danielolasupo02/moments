@@ -9,6 +9,8 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class EmailConfig {
@@ -81,4 +83,35 @@ public class EmailConfig {
             throw new RuntimeException("Failed to send password reset email", e);
         }
     }
+
+    // EmailService.java
+    public void sendMonthlySummary(String toEmail, long entryCount, LocalDate monthYear) {
+        if (toEmail == null || toEmail.isBlank()) {
+            throw new IllegalArgumentException("Recipient email address is missing.");
+        }
+
+        Context context = new Context();
+        context.setVariable("entryCount", entryCount);
+        context.setVariable("monthYear", monthYear.format(DateTimeFormatter.ofPattern("MMMM yyyy")));
+        context.setVariable("link", generateViewLink(monthYear));
+
+        String content = templateEngine.process("email/monthly-reflection", context);
+
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(toEmail); // <-- This was missing
+            helper.setSubject("Your Monthly Journal Reflection");
+            helper.setText(content, true); // true = HTML
+
+            emailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send email", e);
+        }
+    }
+
+    private String generateViewLink(LocalDate monthYear) {
+        return "http://localhost:8081/view-summary?month=" + monthYear.toString();
+    }
+
 }

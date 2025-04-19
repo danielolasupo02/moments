@@ -1,6 +1,7 @@
 package com.journal.journalbackend.model;
 
 import jakarta.persistence.*;
+import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -36,9 +37,8 @@ public class User {
     private LocalDateTime createdAt;
 
     @Column(name = "timezone", nullable = false)
+    @Convert(converter = Jsr310JpaConverters.ZoneIdConverter.class)
     private ZoneId timezone = ZoneId.of("UTC");
-
-
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
