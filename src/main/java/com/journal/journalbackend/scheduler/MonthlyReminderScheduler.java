@@ -26,7 +26,7 @@ public class MonthlyReminderScheduler {
     }
 
 
-   @Scheduled(cron = "0 0 0 1 * ?") // Runs at midnight UTC on the 1st
+    @Scheduled(cron = "0 0 9 1 * ?") // Runs at 9:00 AM UTC on the 1st of every month
     public void triggerMonthlyReflections() {
         logger.info("Starting monthly reflection reminders");
 
