@@ -30,4 +30,20 @@ public class ReminderProducer {
                 message
         );
     }
+
+    public void sendMemoryLaneReminder(User user, long entryCount, LocalDate originalDate) {
+        ReminderMessage message = new ReminderMessage(
+                user.getId(),
+                user.getEmail(),
+                entryCount,
+                originalDate,
+                user.getTimezone().getId()
+        );
+
+        rabbitTemplate.convertAndSend(
+                RabbitConfig.QUEUE_MEMORY_LANE_REMINDERS,
+                message
+        );
+    }
+
 }

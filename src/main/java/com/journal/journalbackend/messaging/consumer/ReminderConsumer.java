@@ -4,7 +4,6 @@ import com.journal.journalbackend.config.EmailConfig;
 import com.journal.journalbackend.config.RabbitConfig;
 import com.journal.journalbackend.messaging.ReminderMessage;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 // ReminderConsumer.java
@@ -25,4 +24,15 @@ public class ReminderConsumer {
                 message.getMonthYear()
         );
     }
+
+    @RabbitListener(queues = RabbitConfig.QUEUE_MEMORY_LANE_REMINDERS)
+    public void processMemoryLaneReminder(ReminderMessage message) {
+        emailService.sendMemoryLaneEmail(
+                message.getEmail(),
+                message.getMonthYear(),
+                message.getEntryCount()
+
+        );
+    }
+
 }

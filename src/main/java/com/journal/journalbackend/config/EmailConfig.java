@@ -2,6 +2,7 @@ package com.journal.journalbackend.config;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.cglib.core.Local;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -110,8 +111,40 @@ public class EmailConfig {
         }
     }
 
+    public void sendMemoryLaneEmail(String toEmail, LocalDate year, long entryCount) {
+        if (toEmail == null || toEmail.isBlank()) {
+            throw new IllegalArgumentException("Recipient email address is missing.");
+        }
+
+        Context context = new Context();
+        context.setVariable("year", year);
+        context.setVariable("entryCount", entryCount);
+        context.setVariable("link", generateMemoryLaneLink(year));
+
+        String content = templateEngine.process("email/memory-lane", context);
+
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(toEmail);
+            helper.setSubject("Take a Stroll Down Memory Lane – Your " + year + " Journal Recap");
+            helper.setText(content, true); // HTML content
+
+            emailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send Memory Lane email", e);
+        }
+    }
+
+
+
     private String generateViewLink(LocalDate monthYear) {
         return "http://localhost:8081/view-summary?month=" + monthYear.toString();
     }
+
+    private String generateMemoryLaneLink(LocalDate year) {
+        return "http://localhost:8081/memory-lane?year=" + year;
+    }
+
 
 }
