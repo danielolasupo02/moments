@@ -1,4 +1,4 @@
-package com.journal.journalbackend.util;
+package com.journal.journalbackend.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

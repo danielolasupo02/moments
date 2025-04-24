@@ -1,4 +1,4 @@
-package com.journal.journalbackend.util;
+package com.journal.journalbackend.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

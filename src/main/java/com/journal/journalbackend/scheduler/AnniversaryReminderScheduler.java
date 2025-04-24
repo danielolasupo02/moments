@@ -30,8 +30,8 @@ public class AnniversaryReminderScheduler {
         this.reminderProducer = reminderProducer;
     }
 
-    /*@Scheduled(cron = "0 0 10 * * ?") // 10:00 AM UTC daily*/
-    @Scheduled(cron = "0/30 * * * * ?")
+    @Scheduled(cron = "0 0 9 * * ?") // Runs every day at 9:00 AM UTC
+    /* @Scheduled(cron = "0/30 * * * * ?") /*Tests trigger method every 30 seconds*/
     public void triggerAnniversaryReminders() {
         logger.info("Checking for journal anniversaries...");
 

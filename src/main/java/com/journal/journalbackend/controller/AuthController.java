@@ -5,7 +5,7 @@ import com.journal.journalbackend.dto.response.LoginResponse;
 import com.journal.journalbackend.model.User;
 import com.journal.journalbackend.repository.UserRepository;
 import com.journal.journalbackend.service.UserService;
-import com.journal.journalbackend.util.JwtTokenProvider;
+import com.journal.journalbackend.security.JwtTokenProvider;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

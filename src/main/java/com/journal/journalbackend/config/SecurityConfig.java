@@ -1,7 +1,7 @@
 package com.journal.journalbackend.config;
 
 import com.journal.journalbackend.service.CustomUserDetailsService;
-import com.journal.journalbackend.util.JwtAuthenticationFilter;
+import com.journal.journalbackend.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
