@@ -1,6 +1,6 @@
 package com.journal.journalbackend.service;
 
-import com.journal.journalbackend.config.EmailConfig.EmailConfig;
+import com.journal.journalbackend.config.EmailConfig;
 import com.journal.journalbackend.dto.request.UserRegistrationRequest;
 import com.journal.journalbackend.model.User;
 import com.journal.journalbackend.model.VerificationToken;

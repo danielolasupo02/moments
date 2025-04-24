@@ -136,6 +136,32 @@ public class EmailConfig {
         }
     }
 
+    public void sendAnniversaryEmail(String toEmail, long entryCount, LocalDate monthYear) {
+        if (toEmail == null || toEmail.isBlank()) {
+            throw new IllegalArgumentException("Recipient email address is missing.");
+        }
+
+        // Prepare the context for Thymeleaf
+        Context context = new Context();
+        context.setVariable("entryCount", entryCount);
+        context.setVariable("monthYear", monthYear.format(DateTimeFormatter.ofPattern("MMMM yyyy")));
+        context.setVariable("link", generateViewLink(monthYear));
+
+        // Process the HTML template
+        String content = templateEngine.process("email/anniversary-reflection", context);
+
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(toEmail);
+            helper.setSubject("🎉 Happy Journal Anniversary! Here's What You Wrote");
+            helper.setText(content, true); // true means HTML
+
+            emailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send Anniversary email", e);
+        }
+    }
 
 
     private String generateViewLink(LocalDate monthYear) {

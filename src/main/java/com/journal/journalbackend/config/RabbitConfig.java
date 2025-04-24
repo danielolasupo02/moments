@@ -16,18 +16,26 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitConfig {
     public static final String QUEUE_MONTHLY_REMINDERS = "monthly-reminders-queue";
     public static final String QUEUE_MEMORY_LANE_REMINDERS = "memory-lane-reminders";
+    public static final String QUEUE_ANNIVERSARY_REMINDERS = "anniversary-reminders";
 
     // Declare the Monthly Reminders Queue
     @Bean
-    public Queue monthlyRemindersQueue() {
-        return new Queue(QUEUE_MONTHLY_REMINDERS, true); // durable = true
+    public Queue monthlyRemindersQueue() {return new Queue(QUEUE_MONTHLY_REMINDERS, true); // durable = true
     }
 
-    // Declare the Memory Lane Reminders Queue
+    // Declare the Anniversary Reminders Queue
+    @Bean
+    public Queue anniversaryRemindersQueue() { return new Queue(QUEUE_ANNIVERSARY_REMINDERS, true);}
+
+    // Declare the Memory Lane (On This Day) Reminders Queue
     @Bean
     public Queue memoryLaneRemindersQueue() {
         return new Queue(QUEUE_MEMORY_LANE_REMINDERS, true); // durable = true
     }
+
+
+
+
 
     // JSON converter with JavaTime support
     @Bean

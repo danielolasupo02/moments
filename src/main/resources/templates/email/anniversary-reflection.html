@@ -1,0 +1,9 @@
+<!-- src/main/resources/templates/email/anniversary-email.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<h1>Your Yearly Journal Reflection</h1>
+<p>You wrote <span th:text="${entryCount}"></span> entries in <span th:text="${monthYear}"></span>!</p>
+<a th:href="${link}">Review Your Yearly Entries</a>
+</body>
+</html>

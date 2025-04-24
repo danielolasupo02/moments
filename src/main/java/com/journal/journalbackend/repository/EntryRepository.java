@@ -29,5 +29,9 @@ public interface EntryRepository extends JpaRepository<Entry, Long> {
             @Param("end") LocalDateTime end
     );
 
+    @Query("SELECT DISTINCT e.entryDate FROM Entry e")
+    List<LocalDate> findDistinctEntryDates();
+
+
 }
 

@@ -46,4 +46,20 @@ public class ReminderProducer {
         );
     }
 
+    public void sendAnniversaryReminder(User user, long yearsAgo, LocalDate originalDate) {
+        ReminderMessage message = new ReminderMessage(
+                user.getId(),
+                user.getEmail(),
+                yearsAgo,
+                originalDate,
+                user.getTimezone().getId()
+        );
+
+        rabbitTemplate.convertAndSend(
+                RabbitConfig.QUEUE_ANNIVERSARY_REMINDERS,
+                message
+        );
+    }
+
+
 }

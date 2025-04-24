@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -90,6 +91,12 @@ public class EntryService {
     public long getEntryCountForUserBetweenDates(Long userId, LocalDateTime start, LocalDateTime end) {
         return entryRepository.countByUserAndDateRange(userId, start, end);
     }
+
+    @Transactional(readOnly = true)
+    public List<LocalDate> getDistinctEntryDates() {
+        return entryRepository.findDistinctEntryDates();
+    }
+
 
     // 🔁 Reused helper methods to remove repetitive logic
     private User getUserByUsername(String username) {

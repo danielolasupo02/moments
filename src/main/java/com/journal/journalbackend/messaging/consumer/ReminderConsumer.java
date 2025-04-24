@@ -6,7 +6,6 @@ import com.journal.journalbackend.messaging.ReminderMessage;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
-// ReminderConsumer.java
 @Component
 public class ReminderConsumer {
 
@@ -34,5 +33,15 @@ public class ReminderConsumer {
 
         );
     }
+
+    @RabbitListener(queues = RabbitConfig.QUEUE_ANNIVERSARY_REMINDERS)
+    public void processAnniversaryReminder(ReminderMessage message) {
+        emailService.sendAnniversaryEmail(
+                message.getEmail(),
+                message.getEntryCount(), // yearsAgo
+                message.getMonthYear()   // original date
+        );
+    }
+
 
 }
