@@ -60,6 +60,21 @@ public class TagService {
                 .collect(Collectors.toList());
     }
 
+    public List<EntryResponse> getEntriesByTag(Long tagId, String username) {
+        User user = getUserByUsername(username);
+
+        Tag tag = tagRepository.findById(tagId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tag not found"));
+
+        if (!tag.getUser().getId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You don't have access to this tag");
+        }
+
+        return tagRepository.findEntriesByTagId(tagId).stream()
+                .map(this::mapToEntryResponse)
+                .collect(Collectors.toList());
+    }
+
 
 
 

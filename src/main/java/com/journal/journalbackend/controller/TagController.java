@@ -1,6 +1,7 @@
 package com.journal.journalbackend.controller;
 
 import com.journal.journalbackend.dto.request.TagRequest;
+import com.journal.journalbackend.dto.response.EntryResponse;
 import com.journal.journalbackend.dto.response.TagResponse;
 import com.journal.journalbackend.service.TagService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +51,16 @@ public class TagController {
         List<TagResponse> tags = tagService.searchTagsByName(query, principal.getName());
         return ResponseEntity.ok(tags);
     }
+
+    @GetMapping("/{tagId}/entries")
+    @Operation(summary = "Get all entries with a specific tag")
+    public ResponseEntity<List<EntryResponse>> getEntriesByTag(
+            @PathVariable Long tagId,
+            Principal principal) {
+        List<EntryResponse> entries = tagService.getEntriesByTag(tagId, principal.getName());
+        return ResponseEntity.ok(entries);
+    }
+
 
 
 
