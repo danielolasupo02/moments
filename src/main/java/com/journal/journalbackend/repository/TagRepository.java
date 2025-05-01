@@ -9,7 +9,6 @@ import java.util.List;
 @Repository
 public interface TagRepository extends JpaRepository<Tag, Long> {
     boolean existsByNameAndUserId(String name, Long userId);
-
     List<Tag> findByUserId(Long userId);
-
+    List<Tag> findByUserIdAndNameContainingIgnoreCase(Long userId, String nameQuery);
 }

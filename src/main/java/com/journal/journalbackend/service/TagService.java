@@ -53,6 +53,14 @@ public class TagService {
                 .collect(Collectors.toList());
     }
 
+    public List<TagResponse> searchTagsByName(String nameQuery, String username) {
+        User user = getUserByUsername(username);
+        return tagRepository.findByUserIdAndNameContainingIgnoreCase(user.getId(), nameQuery).stream()
+                .map(this::mapToTagResponse)
+                .collect(Collectors.toList());
+    }
+
+
 
 
     private TagResponse mapToTagResponse(Tag tag) {

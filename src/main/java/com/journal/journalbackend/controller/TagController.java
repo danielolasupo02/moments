@@ -42,6 +42,16 @@ public class TagController {
         return ResponseEntity.ok(tags);
     }
 
+    @GetMapping("/search")
+    @Operation(summary = "Search tags by name")
+    public ResponseEntity<List<TagResponse>> searchTags(
+            @RequestParam String query,
+            Principal principal) {
+        List<TagResponse> tags = tagService.searchTagsByName(query, principal.getName());
+        return ResponseEntity.ok(tags);
+    }
+
+
 
 
 }
