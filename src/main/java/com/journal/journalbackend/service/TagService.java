@@ -97,6 +97,17 @@ public class TagService {
         entryRepository.save(entry);
     }
 
+    public void removeTagFromEntry(Long entryId, Long tagId, String username) {
+        Entry entry = entryRepository.findById(entryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
+
+        Tag tag = tagRepository.findById(tagId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tag not found"));
+
+        entry.getTags().remove(tag);
+        entryRepository.save(entry);
+    }
+
 
 
 

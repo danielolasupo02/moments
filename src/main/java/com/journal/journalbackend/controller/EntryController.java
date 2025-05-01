@@ -112,6 +112,22 @@ public class EntryController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{entryId}/tags/{tagId}")
+    @Operation(summary = "Remove a tag from an entry")
+    public ResponseEntity<Void> removeTagFromEntry(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            @PathVariable Long tagId,
+            Principal principal) {
+
+        // Verify access to journal first
+        entryService.getEntryById(journalId, entryId, principal.getName());
+
+        tagService.removeTagFromEntry(entryId, tagId, principal.getName());
+        return ResponseEntity.noContent().build();
+    }
+
+
 
 
 }
