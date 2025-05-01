@@ -83,47 +83,5 @@ public class EntryController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{entryId}/tags")
-    @Operation(summary = "Get all tags for an entry")
-    public ResponseEntity<List<TagResponse>> getTagsForEntry(
-            @PathVariable Long journalId,
-            @PathVariable Long entryId,
-            Principal principal) {
 
-        // Verify access to journal first
-        entryService.getEntryById(journalId, entryId, principal.getName());
-
-        List<TagResponse> tags = tagService.getTagsForEntry(entryId, principal.getName());
-        return ResponseEntity.ok(tags);
-    }
-
-    @PostMapping("/{entryId}/tags")
-    @Operation(summary = "Add tags to an entry")
-    public ResponseEntity<Void> addTagsToEntry(
-            @PathVariable Long journalId,
-            @PathVariable Long entryId,
-            @RequestBody List<Long> tagIds,
-            Principal principal) {
-
-        // Verify access to journal first
-        entryService.getEntryById(journalId, entryId, principal.getName());
-
-        tagService.addTagsToEntry(entryId, tagIds, principal.getName());
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/{entryId}/tags/{tagId}")
-    @Operation(summary = "Remove a tag from an entry")
-    public ResponseEntity<Void> removeTagFromEntry(
-            @PathVariable Long journalId,
-            @PathVariable Long entryId,
-            @PathVariable Long tagId,
-            Principal principal) {
-
-        // Verify access to journal first
-        entryService.getEntryById(journalId, entryId, principal.getName());
-
-        tagService.removeTagFromEntry(entryId, tagId, principal.getName());
-        return ResponseEntity.noContent().build();
-    }
 }
