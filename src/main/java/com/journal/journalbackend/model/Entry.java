@@ -3,6 +3,8 @@ package com.journal.journalbackend.model;
 import jakarta.persistence.*;
 
 import java.time.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "entries", indexes = {
@@ -26,6 +28,18 @@ public class Entry {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "journal_id", nullable = false)
     private Journal journal;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "entry_tags",
+            joinColumns = @JoinColumn(name = "entry_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"),
+            indexes = {
+                    @Index(name = "idx_entry_tags_entry", columnList = "entry_id"),
+                    @Index(name = "idx_entry_tags_tag", columnList = "tag_id")
+            }
+    )
+    private Set<Tag> tags = new HashSet<>();
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -86,6 +100,14 @@ public class Entry {
 
     public void setJournal(Journal journal) {
         this.journal = journal;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags;
     }
 
     public LocalDateTime getCreatedAt() {

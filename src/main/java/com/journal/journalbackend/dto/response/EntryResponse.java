@@ -2,6 +2,7 @@ package com.journal.journalbackend.dto.response;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class EntryResponse {
     private Long id;
@@ -9,6 +10,8 @@ public class EntryResponse {
     private String body;
     private LocalDate entryDate;
     private Long journalId;
+
+    private List<TagResponse> tags;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime lastEditedAt;
@@ -52,6 +55,14 @@ public class EntryResponse {
 
     public void setJournalId(Long journalId) {
         this.journalId = journalId;
+    }
+
+    public List<TagResponse> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<TagResponse> tags) {
+        this.tags = tags;
     }
 
     public LocalDateTime getCreatedAt() {

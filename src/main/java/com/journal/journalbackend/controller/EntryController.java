@@ -2,7 +2,9 @@ package com.journal.journalbackend.controller;
 
 import com.journal.journalbackend.dto.request.EntryRequest;
 import com.journal.journalbackend.dto.response.EntryResponse;
+import com.journal.journalbackend.dto.response.TagResponse;
 import com.journal.journalbackend.service.EntryService;
+import com.journal.journalbackend.service.TagService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,11 +22,12 @@ import java.util.List;
 @SecurityRequirement(name = "bearerAuth")
 public class EntryController {
     private final EntryService entryService;
+    private final TagService tagService;
 
-    public EntryController(EntryService entryService) {
+    public EntryController(EntryService entryService, TagService tagService) {
         this.entryService = entryService;
+        this.tagService = tagService;
     }
-
     @PostMapping
     @Operation(summary = "Create a new entry for a journal")
     public ResponseEntity<EntryResponse> createEntry(
@@ -77,6 +80,50 @@ public class EntryController {
             Principal principal) {
 
         entryService.deleteEntry(journalId, entryId, principal.getName());
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{entryId}/tags")
+    @Operation(summary = "Get all tags for an entry")
+    public ResponseEntity<List<TagResponse>> getTagsForEntry(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            Principal principal) {
+
+        // Verify access to journal first
+        entryService.getEntryById(journalId, entryId, principal.getName());
+
+        List<TagResponse> tags = tagService.getTagsForEntry(entryId, principal.getName());
+        return ResponseEntity.ok(tags);
+    }
+
+    @PostMapping("/{entryId}/tags")
+    @Operation(summary = "Add tags to an entry")
+    public ResponseEntity<Void> addTagsToEntry(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            @RequestBody List<Long> tagIds,
+            Principal principal) {
+
+        // Verify access to journal first
+        entryService.getEntryById(journalId, entryId, principal.getName());
+
+        tagService.addTagsToEntry(entryId, tagIds, principal.getName());
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{entryId}/tags/{tagId}")
+    @Operation(summary = "Remove a tag from an entry")
+    public ResponseEntity<Void> removeTagFromEntry(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            @PathVariable Long tagId,
+            Principal principal) {
+
+        // Verify access to journal first
+        entryService.getEntryById(journalId, entryId, principal.getName());
+
+        tagService.removeTagFromEntry(entryId, tagId, principal.getName());
         return ResponseEntity.noContent().build();
     }
 }
