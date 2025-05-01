@@ -85,6 +85,19 @@ public class TagService {
                 .collect(Collectors.toList());
     }
 
+    public void addTagsToEntry(Long entryId, List<Long> tagIds, String username) {
+        Entry entry = entryRepository.findById(entryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
+
+        // Optional: validate ownership if not already validated earlier
+
+        List<Tag> tagsToAdd = tagRepository.findAllById(tagIds);
+
+        entry.getTags().addAll(tagsToAdd);
+        entryRepository.save(entry);
+    }
+
+
 
 
 

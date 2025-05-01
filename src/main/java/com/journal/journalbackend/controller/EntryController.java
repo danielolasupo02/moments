@@ -97,5 +97,21 @@ public class EntryController {
         return ResponseEntity.ok(tags);
     }
 
+    @PostMapping("/{entryId}/tags")
+    @Operation(summary = "Add tags to an entry")
+    public ResponseEntity<Void> addTagsToEntry(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            @RequestBody List<Long> tagIds,
+            Principal principal) {
+
+        // Verify access to journal first
+        entryService.getEntryById(journalId, entryId, principal.getName());
+
+        tagService.addTagsToEntry(entryId, tagIds, principal.getName());
+        return ResponseEntity.noContent().build();
+    }
+
+
 
 }
