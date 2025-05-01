@@ -83,5 +83,19 @@ public class EntryController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/{entryId}/tags")
+    @Operation(summary = "Get all tags for an entry")
+    public ResponseEntity<List<TagResponse>> getTagsForEntry(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            Principal principal) {
+
+        // Verify access to journal first
+        entryService.getEntryById(journalId, entryId, principal.getName());
+
+        List<TagResponse> tags = tagService.getTagsForEntry(entryId, principal.getName());
+        return ResponseEntity.ok(tags);
+    }
+
 
 }

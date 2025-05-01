@@ -75,6 +75,17 @@ public class TagService {
                 .collect(Collectors.toList());
     }
 
+    public List<TagResponse> getTagsForEntry(Long entryId, String username) {
+        Entry entry = entryRepository.findById(entryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Entry not found"));
+
+        // Optional: validate ownership here if not already done in controller
+        return entry.getTags().stream()
+                .map(this::mapToTagResponse)
+                .collect(Collectors.toList());
+    }
+
+
 
 
 
