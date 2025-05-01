@@ -46,6 +46,14 @@ public class TagService {
         return mapToTagResponse(savedTag);
     }
 
+    public List<TagResponse> getAllTagsForUser(String username) {
+        User user = getUserByUsername(username);
+        return tagRepository.findByUserId(user.getId()).stream()
+                .map(this::mapToTagResponse)
+                .collect(Collectors.toList());
+    }
+
+
 
     private TagResponse mapToTagResponse(Tag tag) {
         TagResponse response = new TagResponse();
