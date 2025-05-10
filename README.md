@@ -1,87 +1,82 @@
-📔 Moments Journal — A Modern Journaling App (Open Source Initiative)
-Welcome to the Moments Journal project!
-This is a full-featured digital journaling platform designed to help users document their lives in a seamless and expressive way. Our goal is to build an open-source journaling tool for both web and mobile (React) with a powerful Spring Boot backend, and we’re inviting product designers, React (web/mobile) developers, and Java backend developers to collaborate.
+# 📔 Moments Journal — A Modern Journaling App (Open Source Initiative)
 
-🔧 Core Features
-1. 🔐 User Authentication
-Registration: Collects first name, last name, username, email, and password.
+Welcome to the **Moments Journal** project — a full-featured digital journaling platform that helps users document their lives in a seamless and expressive way. This is an **open-source project** for both **web and mobile (React)**, powered by a **Spring Boot backend**.
 
-Email Verification: After signing up, users receive a verification link via email (resend option available). Clicking the link confirms and verifies the account.
+We’re building a collaborative space for:
+- 🎨 Product Designers  
+- 💻 React (Web/Mobile) Developers  
+- ☕ Java Backend Developers  
 
-Login: Users can sign in with either their email or username and password.
+---
 
-2. 📓 Journals and Entries
-Users can create multiple journals.
+## 🔧 Core Features
 
-Each journal contains entries tied to it.
+### 1. 🔐 User Authentication  
+- **Registration:**  
+  - Fields: `First Name`, `Last Name`, `Username`, `Email`, `Password`  
+- **Email Verification:**  
+  - Users receive a verification link via email  
+  - Option to resend verification  
+  - Clicking the link activates the account  
+- **Login:**  
+  - Via **email** or **username** + password  
 
-An entry includes:
+---
 
-Title
+### 2. 📓 Journals and Entries  
+- Users can create **multiple journals**  
+- Each journal contains multiple **entries**
 
-Entry Date (can be backdated)
+**Entry Fields:**
+- `Title`  
+- `Entry Date` (can be backdated)  
+- `Rich Text Body`  
+  - Includes formatting (bold, italic, bullet points, etc.)  
+  - Image uploads  
+- `Tags` (optional, editable anytime)
 
-Rich Text Body with formatting and image uploads
+---
 
-Tags (optional; can be added/edited/removed later)
+### 3. 🎙️ Speech to Text  
+- Add journal entry content via **voice input**  
+- Real-time speech-to-text functionality  
+- Inspired by **ChatGPT voice input interface**
 
-3. 🎙️ Speech to Text
-Users can add content to journal entries via voice input (speech-to-text), similar to ChatGPT’s voice interface.
+---
 
-4. 🔄 Versioning & Recycle Bin
-Every edit to an entry is tracked with version history. Users can view, restore, or delete versions.
+### 4. 🔄 Versioning & Recycle Bin  
+- All edits are **versioned**  
+- Users can:
+  - View previous versions  
+  - Restore or delete specific versions  
+- Deleted entries go to **Recycle Bin**  
+  - Stored for **30 days** before permanent deletion  
 
-Deleted entries are moved to a Recycle Bin for 30 days before permanent deletion.
+---
 
-5. 🔎 Smart Search
-Search across all journals or within a single journal.
+### 5. 🔎 Smart Search  
+- Global search across **all journals**  
+- Journal-specific search  
+- Filter results by:
+  - `Title`  
+  - `Tags`  
 
-Filter by title or tags.
+---
 
-6. 🔐 Journal Controls
-Journals can be locked (optional).
+### 6. 🔐 Journal Controls  
+Each journal supports:  
+- Viewing all entries  
+- Creating new entries  
+- Searching within itself  
+- Optionally **locked** for privacy  
 
-Each journal supports:
+---
 
-Viewing all entries
+### 7. 📅 Email Reminders  
+- Intelligent reminder system  
+- Encourages regular journaling  
 
-Creating new entries
+---
 
-Searching within the journal
-
-7. 📅 Email Reminders
-Users receive intelligent reminders:
-
-Daily journaling prompts
-
-Streak updates to build habit
-
-"On This Day" reminders (e.g., entries written X months ago)
-
-Anniversary reminders (entries written exactly 1 year ago)
-
-8. 💾 AutoSave
-Entries are automatically saved as users write.
-
-🧩 Project Structure
-Backend: Spring Boot (Java)
-
-Frontend Web: React.js
-
-Frontend Mobile: React Native (Expo)
-
-✅ What’s Ready
-✅ Spring Boot backend (on GitHub)
-
-✅ User authentication
-
-✅ Journal and entry management APIs
-
-🧑‍💻 How to Contribute
-We’re currently looking for contributors in:
-
-Frontend Web (React.js): UI implementation of features like login, journal view, entry creation, versioning, and speech-to-text.
-
-Frontend Mobile (React Native): Mobile-first experience with speech-to-text, reminders, and journal navigation.
-
-Backend (Spring Boot): Email reminders logic, version tracking, recycle bin cleanup job, tagging enhancements.
+## 🤝 Contributing  
+We welcome contributions! Please check our `CONTRIBUTING.md` for guidelines and open issues.
