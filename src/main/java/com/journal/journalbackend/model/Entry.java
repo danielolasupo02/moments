@@ -3,7 +3,9 @@ package com.journal.journalbackend.model;
 import jakarta.persistence.*;
 
 import java.time.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -49,6 +51,30 @@ public class Entry {
 
     @Column(name = "last_edited_at")
     private LocalDateTime lastEditedAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;  // Soft deletion timestamp
+
+    @OneToMany(mappedBy = "entry", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EntryVersion> versions = new ArrayList<>();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "current_version_id")
+    private EntryVersion currentVersion;
+
+    // Soft delete method (cascades to versions)
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
+        this.versions.forEach(EntryVersion::softDelete);
+    }
+
+    // Restore method (cascades to versions)
+    public void restore() {
+        this.deletedAt = null;
+        this.versions.forEach(EntryVersion::restore);
+    }
+
+
 
     public Entry() {
     }
@@ -134,6 +160,30 @@ public class Entry {
         this.lastEditedAt = lastEditedAt;
     }
 
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public List<EntryVersion> getVersions() {
+        return versions;
+    }
+
+    public void setVersions(List<EntryVersion> versions) {
+        this.versions = versions;
+    }
+
+    public EntryVersion getCurrentVersion() {
+        return currentVersion;
+    }
+
+    public void setCurrentVersion(EntryVersion currentVersion) {
+        this.currentVersion = currentVersion;
+    }
+
     // Lifecycle methods
     @PrePersist
     protected void onCreate() {
@@ -147,6 +197,7 @@ public class Entry {
         updatedAt = LocalDateTime.now();
         lastEditedAt = LocalDateTime.now();
     }
+
 
     public ZonedDateTime getCreatedAtInTimezone(ZoneId timezone) {
         return createdAt.atZone(ZoneOffset.UTC).withZoneSameInstant(timezone);

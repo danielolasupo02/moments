@@ -2,6 +2,7 @@ package com.journal.journalbackend.controller;
 
 import com.journal.journalbackend.dto.request.EntryRequest;
 import com.journal.journalbackend.dto.response.EntryResponse;
+import com.journal.journalbackend.dto.response.EntryVersionResponse;
 import com.journal.journalbackend.dto.response.TagResponse;
 import com.journal.journalbackend.service.EntryService;
 import com.journal.journalbackend.service.TagService;
@@ -28,6 +29,7 @@ public class EntryController {
         this.entryService = entryService;
         this.tagService = tagService;
     }
+
     @PostMapping
     @Operation(summary = "Create a new entry for a journal")
     public ResponseEntity<EntryResponse> createEntry(
@@ -72,16 +74,16 @@ public class EntryController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{entryId}")
-    @Operation(summary = "Delete an entry")
-    public ResponseEntity<Void> deleteEntry(
-            @PathVariable Long journalId,
-            @PathVariable Long entryId,
-            Principal principal) {
-
-        entryService.deleteEntry(journalId, entryId, principal.getName());
-        return ResponseEntity.noContent().build();
-    }
+//    @DeleteMapping("/{entryId}")
+//    @Operation(summary = "Delete an entry")
+//    public ResponseEntity<Void> deleteEntry(
+//            @PathVariable Long journalId,
+//            @PathVariable Long entryId,
+//            Principal principal) {
+//
+//        entryService.deleteEntry(journalId, entryId, principal.getName());
+//        return ResponseEntity.noContent().build();
+//    }
 
     @GetMapping("/{entryId}/tags")
     @Operation(summary = "Get all tags for an entry")
@@ -126,6 +128,56 @@ public class EntryController {
         tagService.removeTagFromEntry(entryId, tagId, principal.getName());
         return ResponseEntity.noContent().build();
     }
+
+    // Soft delete endpoint
+    @DeleteMapping("/{entryId}")
+    @Operation(summary = "Soft delete an entry (move to recycle bin)")
+    public ResponseEntity<Void> softDeleteEntry(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            Principal principal) {
+
+        entryService.softDeleteEntry(journalId, entryId, principal.getName());
+        return ResponseEntity.noContent().build();
+    }
+
+    // Restore endpoint
+    @PostMapping("/{entryId}/restore")
+    @Operation(summary = "Restore a soft-deleted entry")
+    public ResponseEntity<Void> restoreEntry(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            Principal principal) {
+
+        entryService.restoreEntry(journalId, entryId, principal.getName());
+        return ResponseEntity.ok().build();
+    }
+
+    // Get version history
+    @GetMapping("/{entryId}/versions")
+    @Operation(summary = "Get version history for an entry")
+    public ResponseEntity<List<EntryVersionResponse>> getEntryVersions(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            Principal principal) {
+
+        List<EntryVersionResponse> versions = entryService.getEntryVersions(journalId, entryId, principal.getName());
+        return ResponseEntity.ok(versions);
+    }
+
+    // Restore specific version
+    @PostMapping("/{entryId}/versions/{versionId}/restore")
+    @Operation(summary = "Restore a specific version")
+    public ResponseEntity<EntryResponse> restoreVersion(
+            @PathVariable Long journalId,
+            @PathVariable Long entryId,
+            @PathVariable Long versionId,
+            Principal principal) {
+
+        EntryResponse response = entryService.restoreVersion(journalId, entryId, versionId, principal.getName());
+        return ResponseEntity.ok(response);
+    }
+
 
 
 
